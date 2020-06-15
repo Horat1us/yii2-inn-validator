@@ -37,4 +37,24 @@ class ValidatorTest extends TestCase
             $error
         );
     }
+
+    public function jsonSchemaDataProvider(): array
+    {
+        return [
+            [new Validator(), ['type' => 'string', 'format' => 'inn',],],
+            [
+                new Validator(['minAge' => 18, 'maxAge' => 70]),
+                ['type' => 'string', 'format' => 'inn', 'min' => 1842700000, 'max' => 3742099999,],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider jsonSchemaDataProvider
+     */
+    public function testJsonSchema(Validator $validator, array $expected): void
+    {
+        $actual = $validator->getJsonSchema();
+        $this->assertEquals($expected, $actual);
+    }
 }
