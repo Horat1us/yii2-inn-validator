@@ -1,13 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Horat1us\Inn\Yii\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Horat1us\Inn\Yii\Validator;
 
 class ValidatorTest extends TestCase
 {
-    public function validateDateProvider(): array
+    public static function validateDateProvider(): array
     {
         return [
             [new Validator(), '3900000000', 'the input value is invalid.'],
@@ -22,11 +25,8 @@ class ValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validateDateProvider
-     * @param string|int $value
-     */
-    public function testValidate(Validator $validator, $value, string $expected = null): void
+    #[DataProvider('validateDateProvider')]
+    public function testValidate(Validator $validator, $value, ?string $expected = null): void
     {
         $this->assertEquals(
             is_null($expected),
@@ -38,20 +38,23 @@ class ValidatorTest extends TestCase
         );
     }
 
-    public function jsonSchemaDataProvider(): array
+    public static function jsonSchemaDataProvider(): array
     {
         return [
             [new Validator(), ['type' => 'string', 'format' => 'inn',],],
             [
                 new Validator(['minAge' => 18, 'maxAge' => 70]),
-                ['type' => 'string', 'format' => 'inn', 'min' => 1842700000, 'max' => 3742099999,],
+                [
+                    'type' => 'string',
+                    'format' => 'inn',
+                    'min' => \Horat1us\Inn\Parser::minimalValue(70),
+                    'max' => \Horat1us\Inn\Parser::maximalValue(18),
+                ],
             ],
         ];
     }
 
-    /**
-     * @dataProvider jsonSchemaDataProvider
-     */
+    #[DataProvider('jsonSchemaDataProvider')]
     public function testJsonSchema(Validator $validator, array $expected): void
     {
         $actual = $validator->getJsonSchema();

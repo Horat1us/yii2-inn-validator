@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Horat1us\Inn\Yii;
 
@@ -27,7 +29,8 @@ class Validator extends validators\Validator implements JsonSchema
         } catch (\InvalidArgumentException $e) {
             return [$this->message, []];
         }
-        if (($this->enableCheckSum && !$parser->isValid())
+        if (
+            ($this->enableCheckSum && !$parser->isValid())
             || (($maxValue = $this->getMaxValue()) && $maxValue < $value)
             || (($minValue = $this->getMinValue()) && $minValue > $value)
         ) {
