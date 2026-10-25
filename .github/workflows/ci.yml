@@ -6,27 +6,34 @@ on:
 
 jobs:
   test:
+    name: PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        php:
+          - "8.4"
+          - "8.5"
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: ${{ matrix.php }}
           coverage: xdebug
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Lint
-        run: vendor/bin/phpcs --standard=PSR2 ./src ./tests
+        run: composer lint
 
       - name: Test
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
